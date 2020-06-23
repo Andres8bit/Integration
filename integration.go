@@ -28,7 +28,7 @@ func Trapizoid(f []NumVal, a, b NumVal, n int) NumVal {
 // Trapizoid:
 // Uses the Trapizoidal method to approximate the integral
 // of any single variable function f. That is conitnous on [a,b] & 1:1
-func Trapizoid2(f Func, a, b NumVal, n int) NumVal {
+func Trapizoid2(f func(x NumVal) NumVal, a, b NumVal, n int) NumVal {
 	h := (b - a) / NumVal(n)
 	fa := f(a)
 	fb := f(b)
@@ -38,6 +38,7 @@ func Trapizoid2(f Func, a, b NumVal, n int) NumVal {
 		x := a + NumVal(i)*h
 		fx := f(x)
 		sum = sum + fx
+
 	}
 	sum = sum * h
 
