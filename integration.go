@@ -1,6 +1,9 @@
 package integration
 
-import "math"
+import (
+	"fmt"
+	"math"
+)
 
 type NumVal float64
 type Func func(x NumVal) NumVal
@@ -97,6 +100,75 @@ func Romberg2(f func(x NumVal) NumVal, a, b NumVal, r [][]NumVal) {
 		}
 
 	}
+}
+
+func Simpson(f []NumVal, a, b NumVal, err float64, level, level_max int) NumVal {
+	level = level + 1
+	n := len(f) - 1
+	h := b - a
+	c := (a + b) / 2
+	d := (a + c) / 2
+	e := (c + b) / 2
+	fa := nested_Mutliplication(f[:], a, n)
+	fb := nested_Mutliplication(f[:], b, n)
+	fc := nested_Mutliplication(f[:], c, n)
+	fd := nested_Mutliplication(f[:], d, n)
+	fe := nested_Mutliplication(f[:], e, n)
+
+	oneSimpson := h*(fa+4*fc) + fb/NumVal(6)
+	twoSimpson := h * (fa + 4*fd + 2*fc + 4*fe + fb) / 12.0
+
+	if level >= level_max {
+		fmt.Println("max level reacched")
+		return twoSimpson
+
+	}
+
+	if math.Abs(float64(twoSimpson-oneSimpson)) < 15*err {
+		return (twoSimpson + (twoSimpson - oneSimpson)) / 15
+
+	}
+
+	//recursive calls to apply adaptive simpsons to both side of the curve.
+	leftSimpson := Simpson(f, a, c, err/2, level, level_max)
+	rightSimpson := Simpson(f, c, b, err/2, level, level_max)
+
+	return leftSimpson + rightSimpson
+
+}
+
+func Simpson2(f func(x NumVal) NumVal, a, b NumVal, err float64, level, level_max int) NumVal {
+	level = level + 1
+	h := b - a
+	c := (a + b) / 2
+	d := (a + c) / 2
+	e := (c + b) / 2
+	fa := f(a)
+	fb := f(b)
+	fc := f(c)
+	fd := f(d)
+	fe := f(e)
+
+	oneSimpson := h*(fa+4*fc) + fb/NumVal(6)
+	twoSimpson := h * (fa + 4*fd + 2*fc + 4*fe + fb) / 12.0
+
+	if level >= level_max {
+		fmt.Println("max level reacched")
+		return twoSimpson
+
+	}
+
+	if math.Abs(float64(twoSimpson-oneSimpson)) < 15*err {
+		return (twoSimpson + (twoSimpson - oneSimpson)) / 15
+
+	}
+
+	//recursive calls to apply adaptive simpsons to both side of the curve.
+	leftSimpson := Simpson2(f, a, c, err/2, level, level_max)
+	rightSimpson := Simpson2(f, c, b, err/2, level, level_max)
+
+	return leftSimpson + rightSimpson
+
 }
 
 // ======== Helper functions ===========
